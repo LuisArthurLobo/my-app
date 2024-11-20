@@ -215,22 +215,24 @@ const ChatInterface: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
     return typeof obj === 'object' && obj !== null && obj.$$typeof === Symbol.for('react.portal');
   };
 
+  const isValidDOMNode = (obj: any): obj is Node => {
+    return obj instanceof Node;
+  };
+
   const renderBotMessage = (message: Message) => {
-    if (typeof message.text === 'string') {
-      if (message.isHtml) {
+    if (typeof message.text === 'string' || isValidDOMNode(message.text)) {
+      if (typeof message.text === 'string' && message.isHtml) {
         return (
           <div
             dangerouslySetInnerHTML={{ __html: message.text }}
-            className="prose prose-invert max-w-none prose-p:my-1 prose-headings:my-2 prose-ul:my-1 prose-li:my-0 prose-pre:my-1"
+            className="prose prose-invert max-w-none prose-p:my-1 prose-headings:my-2 prose-ul:my-1 prose-li:my-0 prose-pre:my-1" 
           />
         );
-      } else {
+      } else if (typeof message.text === 'string'){
+        return message.text; 
+      } else if (isValidDOMNode(message.text)) {
         return message.text;
       }
-    } else if (React.isValidElement(message.text)) {
-      return message.text;
-    } else if (isReactPortal(message.text)) {
-      return ''; 
     }
     
     return ''; 
