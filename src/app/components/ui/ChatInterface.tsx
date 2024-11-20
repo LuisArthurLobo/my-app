@@ -179,18 +179,20 @@ const ChatInterface: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
     }
   };
 
+  const hasProps = (text: any): text is { props: any } => typeof text === 'object' && text !== null && 'props' in text;
+
   const handleCopyMessage = async (text: string | ReactNode, messageId: string) => {
     try {
       let textToCopy: string;
       if (typeof text === 'string') {
         textToCopy = text;
-      } else if ('props' in text && text.props?.dangerouslySetInnerHTML) {
+      } else if (hasProps(text) && text.props?.dangerouslySetInnerHTML) {
         const tempDiv = document.createElement('div');
         tempDiv.innerHTML = text.props.dangerouslySetInnerHTML.__html;
         textToCopy = tempDiv.textContent || tempDiv.innerText;
       } else {
-        // @ts-expect-error: React node children handling
-        textToCopy = text.props?.children?.join('') || '';
+        // Handle other React node types if necessary
+        textToCopy = ''; 
       }
       
       await navigator.clipboard.writeText(textToCopy);
@@ -213,14 +215,14 @@ const ChatInterface: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
 
   const renderBotMessage = (message: Message) => {
     if (message.isHtml) {
-      return (
-        <div 
-          dangerouslySetInnerHTML={{ __html: message.text as string }}
-          className="prose prose-invert max-w-none prose-p:my-1 prose-headings:my-2 prose-ul:my-1 prose-li:my-0 prose-pre:my-1"
-        />
-      );
+      return  <div 
+                dangerouslySetInnerHTML={{ __html: message.text as string }}
+                className="prose prose-invert max-w-none prose-p:my-1 prose-headings:my-2 prose-ul:my-1 prose-li:my-0 prose-pre:my-1"
+              />;
     }
-    return message.text;
+    
+    // Default to an empty string if renderBotMessage returns undefined for other message types
+    return message.text || ''; 
   };
 
   return (
@@ -239,8 +241,8 @@ const ChatInterface: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
               {messages.map((message) => (
                 message.sender === 'user' ? (
                   <UserChatBubble
-                    key={message.id}
-                    message={message}
+                    key={message.id}                   
+                    message={{ id: message.id, text: typeof message.text === 'string' ? message.text : '' }}
                     userInitials={getUserInitials()}
                     copiedMessageId={copiedMessageId}
                     onCopy={handleCopyMessage}

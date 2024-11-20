@@ -3,16 +3,28 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Check, Copy } from "lucide-react";
 import EmojiAvatar from '@/components/ui/EmojiAvatar';
 
-const joinClasses = (...classes) => {
+const joinClasses = (...classes: string[]): string => {
   return classes.filter(Boolean).join(' ');
 };
 
-export const UserChatBubble = ({
-  message,
-  userInitials,
-  copiedMessageId,
-  onCopy
-}) => {
+interface ChatMessage {
+  text: string;
+  id: string;
+}
+
+interface UserChatBubbleProps {
+  message: ChatMessage;
+  userInitials: string;
+  copiedMessageId: string | null;
+  onCopy: (text: string, id: string) => void;
+}
+
+export const UserChatBubble = ({ 
+  message, 
+  userInitials, 
+  copiedMessageId, 
+  onCopy 
+}: UserChatBubbleProps) => {
     return (
     <div className="flex justify-end">
       <div className="flex items-end space-x-2 flex-row-reverse space-x-reverse group">
@@ -32,15 +44,25 @@ export const UserChatBubble = ({
   );
 };
 
-export const BotChatBubble = ({
-  message,
-  isTyping,
-shouldBounce, 
-  isFocused, 
-  isSendHovered, 
-  copiedMessageId,
-  onCopy
-}) => {
+interface BotChatBubbleProps {
+  message: ChatMessage;
+  isTyping: boolean;
+  shouldBounce: boolean;
+  isFocused: boolean;
+  isSendHovered: boolean;
+  copiedMessageId: string | null;
+  onCopy: (text: string, id: string) => void;
+}
+
+export const BotChatBubble = ({ 
+  message, 
+  isTyping, 
+  shouldBounce,
+  isFocused,
+  isSendHovered,
+  copiedMessageId, 
+  onCopy 
+}: BotChatBubbleProps) => {
     return (
     <div className="flex justify-start">
       <div className="flex items-end space-x-2 group">
@@ -61,7 +83,7 @@ shouldBounce,
   );
 };
 
-const ChatBubbleContent = ({ message, copiedMessageId, onCopy, isBot }) => {
+const ChatBubbleContent = ({ message, copiedMessageId, onCopy, isBot }: { message: ChatMessage, copiedMessageId: string | null, onCopy: (text: string, id: string) => void, isBot: boolean }) => {
   return (
     <div 
             onClick={() => onCopy(message.text, message.id)}
