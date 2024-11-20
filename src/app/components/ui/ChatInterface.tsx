@@ -179,8 +179,6 @@ const ChatInterface: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
     }
   };
 
-  const hasProps = (text: any): text is { props: any } => typeof text === 'object' && text !== null && 'props' in text;
-
   const handleCopyMessage = async (text: string | ReactNode, messageId: string) => {
     try {
       let textToCopy: string;
@@ -218,24 +216,24 @@ const ChatInterface: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
   };
 
   const renderBotMessage = (message: Message) => {
-    if (message.text) {
-      if (message.isHtml && typeof message.text === 'string') {
+    if (typeof message.text === 'string') {
+      if (message.isHtml) {
         return (
           <div
             dangerouslySetInnerHTML={{ __html: message.text }}
             className="prose prose-invert max-w-none prose-p:my-1 prose-headings:my-2 prose-ul:my-1 prose-li:my-0 prose-pre:my-1"
           />
         );
-      } else if (typeof message.text === 'string') {
-        return message.text;      
-      } else if (isReactPortal(message.text)) {
-        // If it's a ReactPortal, return an empty string
-        return '';
-      } else if (typeof message.text !== 'string' && !document.createElement('div').appendChild(message.text)) {
-        return ''; // Return empty string if not a valid DOM node
+      } else {
+        return message.text;
       }
+    } else if (React.isValidElement(message.text)) {
+      return message.text;
+    } else if (isReactPortal(message.text)) {
+      return ''; 
     }
-    return '';
+    
+    return ''; 
   };
 
   return (
