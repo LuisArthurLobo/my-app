@@ -213,6 +213,10 @@ const ChatInterface: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
       .slice(0, 2);
   };
 
+  const isReactPortal = (obj: any): obj is React.ReactPortal => {
+    return typeof obj === 'object' && obj !== null && obj.$$typeof === Symbol.for('react.portal');
+  };
+
   const renderBotMessage = (message: Message) => {
     if (message.text) {
       if (message.isHtml && typeof message.text === 'string') {
@@ -224,9 +228,9 @@ const ChatInterface: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
         );
       } else if (typeof message.text === 'string') {
         return message.text;      
-      } else if (React.isValidElement(message.text) && message.text.$$typeof === Symbol.for('react.portal')) {
-        // Return empty string if it's a ReactPortal
-        return ''; 
+      } else if (isReactPortal(message.text)) {
+        // If it's a ReactPortal, return an empty string
+        return '';
       } else if (typeof message.text !== 'string' && !document.createElement('div').appendChild(message.text)) {
         return ''; // Return empty string if not a valid DOM node
       }
