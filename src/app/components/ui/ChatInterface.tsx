@@ -225,12 +225,12 @@ const ChatInterface: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
       } else if (typeof message.text === 'string') {
         return message.text;
       } else if (React.isValidElement(message.text)) {
-        // Convert React element to string representation
-        const tempDiv: HTMLDivElement = document.createElement('div');
-        tempDiv.appendChild(message.text);
-        return tempDiv.textContent || tempDiv.innerText || '';
+        // Handle ReactPortal or invalid DOM nodes by returning empty string
+        if (message.text.$$typeof === Symbol.for('react.portal') || !document.createElement('div').appendChild(message.text)) {
+          return '';
+        }
       } else {
-        return String(message.text); 
+        return String(message.text);
       }
     }
     return '';
