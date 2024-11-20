@@ -219,6 +219,10 @@ const ChatInterface: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
     return obj instanceof Node;
   };
 
+  const hasProps = (obj: any): obj is { props: { [key: string]: any } } => {
+    return typeof obj === 'object' && obj !== null && typeof obj.props === 'object';
+  };
+
   const renderBotMessage = (message: Message) => {
     if (typeof message.text === 'string' || isValidDOMNode(message.text)) {
       if (typeof message.text === 'string' && message.isHtml) {
