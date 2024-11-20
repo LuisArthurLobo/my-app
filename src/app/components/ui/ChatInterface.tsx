@@ -226,7 +226,7 @@ const ChatInterface: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
         return message.text;
       } else if (React.isValidElement(message.text)) {
         // Convert React element to string representation
-        const tempDiv = document.createElement('div');
+        const tempDiv: HTMLDivElement = document.createElement('div');
         tempDiv.appendChild(message.text);
         return tempDiv.textContent || tempDiv.innerText || '';
       } else {
