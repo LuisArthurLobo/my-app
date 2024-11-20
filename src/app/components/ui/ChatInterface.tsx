@@ -214,15 +214,19 @@ const ChatInterface: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
   };
 
   const renderBotMessage = (message: Message) => {
-    if (message.isHtml) {
-      return  <div 
-                dangerouslySetInnerHTML={{ __html: message.text as string }}
-                className="prose prose-invert max-w-none prose-p:my-1 prose-headings:my-2 prose-ul:my-1 prose-li:my-0 prose-pre:my-1"
-              />;
+    if (message.isHtml && typeof message.text === 'string') {
+      return (
+        <div
+          dangerouslySetInnerHTML={{ __html: message.text }}
+          className="prose prose-invert max-w-none prose-p:my-1 prose-headings:my-2 prose-ul:my-1 prose-li:my-0 prose-pre:my-1"
+        />
+      );
+    } else if (typeof message.text === 'string') {
+      return message.text;
+    } else if (message.text) {
+      return String(message.text);
     }
-    
-    // Default to an empty string if renderBotMessage returns undefined for other message types
-    return message.text || ''; 
+    return '';
   };
 
   return (
