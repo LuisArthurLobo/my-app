@@ -9,6 +9,7 @@ import { UserChatBubble, BotChatBubble } from '@/components/ui/ChatBubble';
 import CareerPromptsDialog from '@/components/ui/CareerPromptsDialog';
 import geminiService from '@/geminiService.js';
 import MarkdownIt from 'markdown-it';
+import ReactDOMServer from 'react-dom/server';
 
 interface Message {
   id: string;
@@ -224,19 +225,20 @@ const ChatInterface: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
   };
 
   const renderBotMessage = (message: Message) => {
-    if (typeof message.text === 'string' || isValidDOMNode(message.text)) {
-      if (typeof message.text === 'string' && message.isHtml) {
-        return (
-          <div
-            dangerouslySetInnerHTML={{ __html: message.text }}
-            className="prose prose-invert max-w-none prose-p:my-1 prose-headings:my-2 prose-ul:my-1 prose-li:my-0 prose-pre:my-1" 
-          />
-        );
-      } else if (typeof message.text === 'string'){
-        return message.text; 
-      } else if (isValidDOMNode(message.text)) {
+    if (typeof message.text === 'string') {
+      if (message.isHtml) {
+        // If it's HTML, wrap it in a div and return the HTML string
+        return `<div class="prose prose-invert max-w-none prose-p:my-1 prose-headings:my-2 prose-ul:my-1 prose-li:my-0 prose-pre:my-1">${message.text}</div>`;
+      } else {
+        // If it's plain text, return it as is
         return message.text;
       }
+    } else if (React.isValidElement(message.text)) {
+      // If it's a React element, convert it to a string
+      return ReactDOMServer.renderToStaticMarkup(message.text);
+    } else if (isValidDOMNode(message.text)) {
+      // If it's a DOM node, get its text content
+      return message.text.textContent || '';
     }
     
     return ''; 
